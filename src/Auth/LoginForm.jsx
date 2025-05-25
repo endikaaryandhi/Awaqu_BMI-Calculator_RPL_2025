@@ -76,7 +76,7 @@ const LoginForm = () => {
         </button>
       </form>
 
-      <p className="text-sm text-gray-700 mt-8">
+      <p className="text-sm text-gray-700 mt-8 text-center">
         Don’t have an account?{' '}
         <Link to="/register" className="text-[#16B3AC] font-medium hover:underline">
           Sign Up
