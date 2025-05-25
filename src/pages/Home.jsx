@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import Navbar from '../components/Navbar';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -11,9 +12,9 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <h1>Welcome to Home Page</h1>
-      <p>You are logged in!</p>
+        <div className="min-h-screen bg-white">
+      <Navbar />
+
       <button
         onClick={handleLogout}
         style={{
