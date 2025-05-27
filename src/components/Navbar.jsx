@@ -9,7 +9,13 @@ const Navbar = () => {
 
   return (
     <header className="bg-gradient-to-r from-[#16B3AC] to-[#D2DC02] px-8 py-4 shadow-md flex justify-between items-center">
-      <h1 className="text-2xl font-bold text-black">AwaQu</h1>
+      <h1 className="text-2xl text-black">       
+        <span className="font-bold">A</span>
+        <span>w</span>
+        <span>a</span>
+        <span className="font-bold">Q</span>
+        <span>u</span>
+        </h1>
         <nav className="space-x-6 text-sm font-medium">
         <Link
             to="/home"

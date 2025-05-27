@@ -63,9 +63,13 @@ const History = () => {
             {/* Title */}
             <h3 className="text-xl font-semibold text-center mb-6">RIWAYAT HASIL BMI</h3>
 
+
             {loading ? (
-            <div className="text-center text-gray-500">Loading data...</div>
-            ) : (
+          <div className="flex flex-col items-center justify-center text-center text-sm text-gray-500">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600 mb-3"></div>
+            Loading data...
+          </div>
+        ) : (
             <>
                 {/* Tabel */}
                 <div className="overflow-x-auto">
