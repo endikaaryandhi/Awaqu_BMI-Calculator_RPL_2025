@@ -5,9 +5,9 @@ import BMICalculator from '../components/BMICalculator';
 
 export default function Calculator() {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen flex flex-col"> 
       <Navbar />
-      <main className="flex-grow"> {/* Added flex-grow here */}
+      <main className="flex-grow flex flex-col items-center justify-center px-4 py-8 sm:py-12 bg-gradient-to-br from-green-100 via-yellow-50 to-teal-50">
         <BMICalculator />
       </main>
       <footer className="text-center text-xs text-black py-4">

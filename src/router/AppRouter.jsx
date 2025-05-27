@@ -13,7 +13,7 @@ const AppRouter = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Ambil user aktif saat ini
+
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -21,7 +21,6 @@ const AppRouter = () => {
     };
     getUser();
 
-    // Listener login/logout
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -31,7 +30,7 @@ const AppRouter = () => {
     };
   }, []);
 
-  if (loading) return <div>Loading...</div>; // Loading sementara
+  if (loading) return <div>Loading...</div>; 
 
   return (
     <Router>

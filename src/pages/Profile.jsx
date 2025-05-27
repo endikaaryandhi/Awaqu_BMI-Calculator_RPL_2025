@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaIdBadge, FaLeaf } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaIdBadge } from 'react-icons/fa'; 
 import { supabase } from '../utils/supabaseClient';
 import Navbar from '../components/Navbar';
+import EditBio from '../components/EditBio'; 
 import { toast } from 'react-hot-toast';
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState(null);       // Supabase user
-  const [profile, setProfile] = useState(null);         // Data dari tabel 'profiles'
+  const [userData, setUserData] = useState(null);       
+  const [profile, setProfile] = useState(null);         
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      const currentUser = data?.user;
+      setLoading(true); 
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      const currentUser = authData?.user;
 
-      if (error || !currentUser) {
-        console.error("Auth Error:", error?.message || 'User not found');
+      if (authError || !currentUser) {
+        console.error("Auth Error:", authError?.message || 'User not found');
+        toast.error('You need to be logged in to view this page.');
         navigate('/login');
         return;
       }
@@ -26,13 +29,14 @@ const ProfilePage = () => {
 
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*') 
         .eq('id', currentUser.id)
         .single();
 
       if (profileError) {
         console.error("Profile Error:", profileError.message);
         toast.error('Gagal mengambil data profil.');
+        setProfile({ id: currentUser.id, full_name: 'N/A', bio: '' }); 
       } else {
         setProfile(profileData);
       }
@@ -44,8 +48,20 @@ const ProfilePage = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Logout failed: ' + error.message);
+    } else {
+      toast.success('Logged out successfully!');
+      navigate('/login');
+    }
+  };
+
+  const handleBioUpdated = (newBio) => {
+    setProfile(prevProfile => ({
+      ...prevProfile,
+      bio: newBio,
+    }));
   };
 
   return (
@@ -54,9 +70,13 @@ const ProfilePage = () => {
 
       <main className="flex-1 max-w-3xl mx-auto px-4 py-12">
         {loading ? (
-          <div className="flex flex-col items-center justify-center text-center text-sm text-gray-500">
+          <div className="flex flex-col items-center justify-center text-center text-sm text-gray-500 min-h-[300px]">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600 mb-3"></div>
             Memuat data profil...
+          </div>
+        ) : !profile || !userData ? (
+          <div className="text-center text-gray-500">
+            Tidak dapat memuat data profil. Silakan coba lagi.
           </div>
         ) : (
           <>
@@ -69,16 +89,21 @@ const ProfilePage = () => {
 
             {/* Info List */}
             <div className="w-full max-w-md mx-auto space-y-6 text-sm">
-              <ProfileItem icon={<FaUser />} label="Username" value={profile?.full_name || '-'} />
+              <ProfileItem icon={<FaUser />} label="Username" value={profile?.full_name || userData?.user_metadata?.full_name || '-'} />
               <ProfileItem icon={<FaIdBadge />} label="AWAQU ID" value={userData?.id || '-'} />
               <ProfileItem icon={<FaEnvelope />} label="Email" value={userData?.email || '-'} />
-              <ProfileItem icon={<FaLeaf />} label="Bio" value="Selamat datang di AwaQu!" />
+              
+              <EditBio
+                userId={userData.id}
+                initialBio={profile?.bio || ''} 
+                onBioUpdateSuccess={handleBioUpdated} 
+              />
             </div>
 
             <div className="text-center">
               <button
                 onClick={handleLogout}
-                className="mt-10 px-6 py-2 bg-green-600 text-white rounded-md font-semibold hover:opacity-80 transition"
+                className="mt-10 px-6 py-2 bg-red-600 text-white rounded-md font-semibold hover:opacity-80 transition" 
               >
                 Logout
               </button>
@@ -94,7 +119,6 @@ const ProfilePage = () => {
   );
 };
 
-// Komponen kecil reusable
 const ProfileItem = ({ icon, label, value }) => (
   <div className="flex items-center gap-4">
     <div className="bg-lime-300 p-3 rounded-full">{icon}</div>

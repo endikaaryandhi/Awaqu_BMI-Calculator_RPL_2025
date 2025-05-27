@@ -6,7 +6,7 @@ import { supabase } from '../utils/supabaseClient';
 const History = () => {
   const [user, setUser] = useState(null);
   const [records, setRecords] = useState([]);
-  const [limit, setLimit] = useState(10); // jumlah data ditampilkan
+  const [limit, setLimit] = useState(10); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

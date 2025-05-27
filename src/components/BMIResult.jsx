@@ -13,15 +13,13 @@ export default function BMIResult({ bmi, category }) {
   ];
 
   const currentCategoryDetails = categoryConfig.find(c => c.name === category) || {};
-  const bmiDisplay = bmi.toString().replace('.', ','); // Menampilkan koma seperti di gambar
+  const bmiDisplay = bmi.toString().replace('.', ','); 
 
   const getSaran = (bmiCategory) => {
     const allSaran = {
       'Normal': [
         "Pertahankan pola makan saat ini agar tetap dalam kondisi optimal.",
         "Untuk mempertahankan BMI normal, lakukan aktifitas fisik 3 kali dalam seminggu.",
-        "PMO 3 kali dalam sehari biar sehat.", // Sesuai gambar
-        "Login sampe subuh." // Sesuai gambar
       ],
       'Kurus': [
         "Tingkatkan asupan kalori dengan makanan bergizi seimbang.",
@@ -71,7 +69,6 @@ export default function BMIResult({ bmi, category }) {
                 ${cat.name === category ? 'transform scale-110 ring-2 ring-offset-2 ring-gray-500' : 'opacity-60'}`}
               title={cat.name}
             >
-              {/* Idealnya ini adalah SVG atau gambar siluet */}
             </div>
             <span className="text-xxs sm:text-xs mt-1 font-medium text-gray-600">{cat.silhouetteText}</span>
             <span className={`text-xxs sm:text-xs font-bold ${cat.name === category ? cat.textColor : 'text-gray-500'}`}>{cat.name}</span>
@@ -107,8 +104,6 @@ export default function BMIResult({ bmi, category }) {
               className={`block text-[0.6rem] sm:text-xs font-medium break-words
                 ${cat.name === category ? `${currentCategoryDetails.textColor} font-extrabold` : 'text-gray-500'}`}
             >
-              {/* Nama kategori sudah ada di siluet, bisa dihilangkan di sini jika terlalu ramai */}
-              {/* {cat.name} */}
             </span>
           </div>
         ))}
@@ -125,22 +120,6 @@ export default function BMIResult({ bmi, category }) {
           ))}
         </ul>
       </div>
-
-      <p className="text-center text-xs text-gray-400 mt-8">© 2025AWAQU-Kelompok10</p>
     </div>
   );
 }
-
-// Jika Anda belum memiliki text-xxs atau text-[0.6rem] di Tailwind config,
-// Anda mungkin perlu menambahkannya atau menggunakan kelas text-xs dan menyesuaikan.
-// Untuk Tailwind JIT mode, text-[0.6rem] akan bekerja.
-// tailwind.config.js (contoh jika perlu):
-// module.exports = {
-//   theme: {
-//     extend: {
-//       fontSize: {
-//         'xxs': '0.65rem', // Atur sesuai kebutuhan
-//       }
-//     }
-//   }
-// }

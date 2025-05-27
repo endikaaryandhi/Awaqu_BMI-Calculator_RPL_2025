@@ -1,26 +1,25 @@
 // src/components/BMICalculator.jsx
 import React, { useState } from 'react';
-import { supabase } from '../utils/supabaseClient'; // Ensure this path is correct
-import BMIResult from './BMIResult'; // Ensure this path is correct
+import { supabase } from '../utils/supabaseClient'; 
+import BMIResult from './BMIResult'; 
 import { FaMale, FaFemale } from 'react-icons/fa';
 
 export default function BMICalculator() {
-  const [gender, setGender] = useState(''); // Default to no selection
+  const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [bmiResult, setBmiResult] = useState(null);
   const [category, setCategory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(''); // For displaying errors on the UI
+  const [error, setError] = useState('');
 
   const calculateBMI = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setBmiResult(null); // Reset previous result
-    setError(''); // Reset previous error
+    setBmiResult(null);
+    setError('');
 
-    // Validation
     if (!gender) {
       setError('Silakan pilih jenis kelamin.');
       setIsLoading(false);
@@ -44,19 +43,17 @@ export default function BMICalculator() {
       bmiCategory = 'Gemuk';
     } else if (calculatedBmi >= 30 && calculatedBmi <= 34.9) {
       bmiCategory = 'Obesitas 1';
-    } else { // bmi >= 35
+    } else {
       bmiCategory = 'Obesitas 2';
     }
 
     setBmiResult(calculatedBmi);
     setCategory(bmiCategory);
 
-    // Supabase interaction
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) {
       console.warn('Gagal mengambil data user:', userError.message);
-      // Proceed to show BMI result even if user fetch fails
     }
     
     if (user) {
@@ -67,15 +64,14 @@ export default function BMICalculator() {
           age: parseInt(age),
           height: parseFloat(height),
           weight: parseFloat(weight),
-          bmi: calculatedBmi, // Use the calculated BMI
+          bmi: calculatedBmi,
           category: bmiCategory,
-          created_at: new Date().toISOString(), // Kept as per original user code
+          created_at: new Date().toISOString(),
         },
       ]);
 
       if (dbError) {
         console.error('Gagal menyimpan data BMI:', dbError.message);
-        // Display a non-blocking error message if saving fails
         setError('Hasil BMI berhasil dihitung, tetapi gagal menyimpan data ke riwayat. Silakan coba lagi nanti.');
       }
     } else {
@@ -95,7 +91,6 @@ export default function BMICalculator() {
     setError('');
   };
 
-  // Custom Alert Component for displaying errors
   const AlertMessage = ({ message }) => {
     if (!message) return null;
     return (
@@ -107,8 +102,7 @@ export default function BMICalculator() {
   };
 
   return (
-    // Main container for the calculator section with a gradient background
-    <div className="flex flex-col items-center w-full px-4 py-8 sm:py-12 bg-gradient-to-br from-green-100 via-yellow-50 to-teal-50">
+    <div className="flex flex-col items-center">
       {!bmiResult && !isLoading && (
         // Calculator card
         <div className="max-w-lg w-full bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
@@ -116,7 +110,7 @@ export default function BMICalculator() {
             {/* Gender Selection */}
             <div className="grid grid-cols-2 gap-4">
               <button
-                type="button" // Crucial to prevent form submission
+                type="button"
                 onClick={() => setGender('male')}
                 className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg 
                             transition-all duration-200 ease-in-out transform hover:scale-105
@@ -126,7 +120,7 @@ export default function BMICalculator() {
                 <span className={`font-semibold ${gender === 'male' ? 'text-green-700' : 'text-gray-600'}`}>Laki-laki</span>
               </button>
               <button
-                type="button" // Crucial to prevent form submission
+                type="button"
                 onClick={() => setGender('female')}
                 className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg 
                             transition-all duration-200 ease-in-out transform hover:scale-105
@@ -212,7 +206,7 @@ export default function BMICalculator() {
       )}
 
       {bmiResult && !isLoading && (
-        <div className="w-full max-w-lg flex flex-col items-center mt-8 sm:mt-12">
+        <div className="w-full max-w-lg flex flex-col items-center"> 
           <BMIResult bmi={bmiResult} category={category} />
           <button
             onClick={resetCalculator}
