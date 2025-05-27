@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
+import { toast } from 'react-hot-toast';
+
 
 const RegisterForm = () => {
   const [fullName, setFullName] = useState('');
@@ -35,7 +37,7 @@ const RegisterForm = () => {
 
     if (error) {
         setLoading(false);
-        return alert(error.message);
+        toast.error(error.message);
     }
 
     const user = data.user;
