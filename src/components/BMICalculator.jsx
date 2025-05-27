@@ -1,0 +1,227 @@
+// src/components/BMICalculator.jsx
+import React, { useState } from 'react';
+import { supabase } from '../utils/supabaseClient'; // Ensure this path is correct
+import BMIResult from './BMIResult'; // Ensure this path is correct
+import { FaMale, FaFemale } from 'react-icons/fa';
+
+export default function BMICalculator() {
+  const [gender, setGender] = useState(''); // Default to no selection
+  const [age, setAge] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [bmiResult, setBmiResult] = useState(null);
+  const [category, setCategory] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(''); // For displaying errors on the UI
+
+  const calculateBMI = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setBmiResult(null); // Reset previous result
+    setError(''); // Reset previous error
+
+    // Validation
+    if (!gender) {
+      setError('Silakan pilih jenis kelamin.');
+      setIsLoading(false);
+      return;
+    }
+    if (height <= 0 || weight <= 0 || age <= 0 || isNaN(parseFloat(height)) || isNaN(parseFloat(weight)) || isNaN(parseInt(age))) {
+      setError('Usia, tinggi badan, dan berat badan harus diisi dengan angka yang valid dan lebih dari 0.');
+      setIsLoading(false);
+      return;
+    }
+
+    const heightInMeters = parseFloat(height) / 100;
+    const calculatedBmi = parseFloat((parseFloat(weight) / (heightInMeters * heightInMeters)).toFixed(1));
+
+    let bmiCategory = '';
+    if (calculatedBmi < 18.5) {
+      bmiCategory = 'Kurus';
+    } else if (calculatedBmi >= 18.5 && calculatedBmi <= 24.9) {
+      bmiCategory = 'Normal';
+    } else if (calculatedBmi >= 25 && calculatedBmi <= 29.9) {
+      bmiCategory = 'Gemuk';
+    } else if (calculatedBmi >= 30 && calculatedBmi <= 34.9) {
+      bmiCategory = 'Obesitas 1';
+    } else { // bmi >= 35
+      bmiCategory = 'Obesitas 2';
+    }
+
+    setBmiResult(calculatedBmi);
+    setCategory(bmiCategory);
+
+    // Supabase interaction
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError) {
+      console.warn('Gagal mengambil data user:', userError.message);
+      // Proceed to show BMI result even if user fetch fails
+    }
+    
+    if (user) {
+      const { error: dbError } = await supabase.from('bmi_records').insert([
+        {
+          user_id: user.id,
+          gender,
+          age: parseInt(age),
+          height: parseFloat(height),
+          weight: parseFloat(weight),
+          bmi: calculatedBmi, // Use the calculated BMI
+          category: bmiCategory,
+          created_at: new Date().toISOString(), // Kept as per original user code
+        },
+      ]);
+
+      if (dbError) {
+        console.error('Gagal menyimpan data BMI:', dbError.message);
+        // Display a non-blocking error message if saving fails
+        setError('Hasil BMI berhasil dihitung, tetapi gagal menyimpan data ke riwayat. Silakan coba lagi nanti.');
+      }
+    } else {
+        console.log('User tidak login, BMI tidak disimpan ke riwayat.');
+    }
+    setIsLoading(false);
+  };
+
+  const resetCalculator = () => {
+    setGender('');
+    setAge('');
+    setHeight('');
+    setWeight('');
+    setBmiResult(null);
+    setCategory('');
+    setIsLoading(false);
+    setError('');
+  };
+
+  // Custom Alert Component for displaying errors
+  const AlertMessage = ({ message }) => {
+    if (!message) return null;
+    return (
+      <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
+        <p className="font-bold">Peringatan</p>
+        <p>{message}</p>
+      </div>
+    );
+  };
+
+  return (
+    // Main container for the calculator section with a gradient background
+    <div className="flex flex-col items-center w-full px-4 py-8 sm:py-12 bg-gradient-to-br from-green-100 via-yellow-50 to-teal-50">
+      {!bmiResult && !isLoading && (
+        // Calculator card
+        <div className="max-w-lg w-full bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+          <form onSubmit={calculateBMI} className="space-y-6">
+            {/* Gender Selection */}
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button" // Crucial to prevent form submission
+                onClick={() => setGender('male')}
+                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg 
+                            transition-all duration-200 ease-in-out transform hover:scale-105
+                            ${gender === 'male' ? 'border-green-500 bg-green-50 shadow-lg scale-105 ring-2 ring-green-500 ring-offset-1' : 'border-gray-300 hover:border-gray-400'}`}
+              >
+                <FaMale size={30} className={`mb-2 ${gender === 'male' ? 'text-green-600' : 'text-gray-400'}`} />
+                <span className={`font-semibold ${gender === 'male' ? 'text-green-700' : 'text-gray-600'}`}>Laki-laki</span>
+              </button>
+              <button
+                type="button" // Crucial to prevent form submission
+                onClick={() => setGender('female')}
+                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg 
+                            transition-all duration-200 ease-in-out transform hover:scale-105
+                            ${gender === 'female' ? 'border-pink-500 bg-pink-50 shadow-lg scale-105 ring-2 ring-pink-500 ring-offset-1' : 'border-gray-300 hover:border-gray-400'}`}
+              >
+                <FaFemale size={30} className={`mb-2 ${gender === 'female' ? 'text-pink-600' : 'text-gray-400'}`} />
+                <span className={`font-semibold ${gender === 'female' ? 'text-pink-700' : 'text-gray-600'}`}>Perempuan</span>
+              </button>
+            </div>
+            
+            <AlertMessage message={error} />
+
+            {/* Age Input */}
+            <div>
+              <label htmlFor="age" className="block mb-1.5 text-sm font-medium text-gray-700">Berapa Usia Anda</label>
+              <div className="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
+                <input
+                  id="age"
+                  type="number"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none"
+                  min="1"
+                  placeholder="Masukan Usia Anda"
+                />
+                <span className="px-3 text-sm text-gray-500">Thn</span>
+              </div>
+            </div>
+
+            {/* Height Input */}
+            <div>
+              <label htmlFor="height" className="block mb-1.5 text-sm font-medium text-gray-700">Berapa Tinggi Anda</label>
+              <div className="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
+                <input
+                  id="height"
+                  type="number"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none"
+                  min="1"
+                  placeholder="Masukan Tinggi Anda"
+                />
+                <span className="px-3 text-sm text-gray-500">Cm</span>
+              </div>
+            </div>
+
+            {/* Weight Input */}
+            <div>
+              <label htmlFor="weight" className="block mb-1.5 text-sm font-medium text-gray-700">Berapa Berat Badan Anda</label>
+              <div className="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
+                <input
+                  id="weight"
+                  type="number"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none"
+                  min="1"
+                  placeholder="Masukan Berat Badan Anda"
+                />
+                <span className="px-3 text-sm text-gray-500">Kg</span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-green-500 text-white py-3.5 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-150 font-semibold text-lg shadow-md hover:shadow-lg"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Menghitung...' : 'Hitung BMI'}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="text-center py-20 flex flex-col items-center justify-center">
+          <svg className="animate-spin h-12 w-12 text-green-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-xl font-semibold text-green-700 mt-4">Menghitung BMI Anda...</p>
+        </div>
+      )}
+
+      {bmiResult && !isLoading && (
+        <div className="w-full max-w-lg flex flex-col items-center mt-8 sm:mt-12">
+          <BMIResult bmi={bmiResult} category={category} />
+          <button
+            onClick={resetCalculator}
+            className="mt-8 mb-4 bg-gray-600 text-white py-3 px-8 rounded-lg hover:bg-gray-700 transition duration-150 font-medium text-base shadow hover:shadow-md"
+          >
+            Hitung Ulang
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

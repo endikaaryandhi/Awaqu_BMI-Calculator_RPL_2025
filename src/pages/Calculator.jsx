@@ -1,34 +1,18 @@
+// pages/Calculator.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
 import Navbar from '../components/Navbar';
+import BMICalculator from '../components/BMICalculator';
 
-export default function Home() {
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut(); // keluar dari Supabase
-    navigate('/'); // arahkan ke halaman login
-  };
-
+export default function Calculator() {
   return (
-        <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
-
-      <button
-        onClick={handleLogout}
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#f44336',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}
-      >
-        Logout
-      </button>
+      <main className="flex-grow"> {/* Added flex-grow here */}
+        <BMICalculator />
+      </main>
+      <footer className="text-center text-xs text-black py-4">
+        © 2025 AWAQU-Kelompok10
+      </footer>
     </div>
   );
 }

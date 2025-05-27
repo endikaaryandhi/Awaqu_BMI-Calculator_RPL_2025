@@ -95,10 +95,10 @@ const History = () => {
                         records.map((item, index) => (
                         <tr key={index} className="border-t border-gray-300">
                             <td className="px-4 py-2">{item.gender}</td>
-                            <td className="px-4 py-2">{item.tinggi} cm</td>
-                            <td className="px-4 py-2">{item.berat} kg</td>
+                            <td className="px-4 py-2">{item.height} cm</td>
+                            <td className="px-4 py-2">{item.weight} kg</td>
                             <td className="px-4 py-2">{item.bmi.toFixed(1)}</td>
-                            <td className="px-4 py-2">{item.kategori}</td>
+                            <td className="px-4 py-2">{item.category}</td>
                             <td className="px-4 py-2">
                             {new Date(item.created_at).toLocaleDateString('id-ID')}
                             </td>
