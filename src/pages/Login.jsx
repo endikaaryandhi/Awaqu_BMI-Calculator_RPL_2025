@@ -5,7 +5,7 @@ const Login = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#2dd4bf] to-[#fde68a] relative px-4 font-sans4">
       
       {/* Logo */}
-      <div className="absolute top-5 left-4 md:left-10 text-4xl z-10 flex space-x-1 font-semibold tracking-wide cursor-default select-none drop-shadow-lg">
+      <div className="absolute top-7 left-4 md:left-10 text-5xl z-10 flex space-x-1 font-semibold tracking-wide cursor-default select-none drop-shadow-lg">
         <span className="text-[#064E3B] font-bold">A</span>
         <span className="text-[#0F766E]">w</span>
         <span className="text-[#DC2626]">a</span>

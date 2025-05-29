@@ -18,10 +18,10 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="min-h-screen flex flex-col-reverse md:flex-row items-center justify-center px-4 md:px-20 pt-10 md:pt-24 pb-10">
+      <section className="min-h-screen flex flex-col-reverse md:flex-row items-center justify-center px-4 md:px-20 pt-2 md:pt-2 pb-10">
         <div className="md:w-1/2 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Body Mass Index</h1>
-          <p className="mb-6 text-lg">
+          <p className="mb-6 text-lg text-justify">
             Tubuh ideal merupakan dambaan setiap orang. Selain menunjang penampilan, memiliki tubuh ideal dapat menghindarkan Anda dari berbagai risiko penyakit.
           </p>
           <button
@@ -65,7 +65,7 @@ export default function Home() {
           <img
             src={bmiCategoriesChartImage}
             alt="Bagan Kategori BMI"
-            className="w-full md:w-3/4 rounded-lg shadow-md"
+            className="w-full md:w-1/2 rounded-lg shadow-md"
           />
         </div>
       </section>

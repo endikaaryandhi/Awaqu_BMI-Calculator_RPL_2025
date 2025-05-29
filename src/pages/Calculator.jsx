@@ -16,7 +16,7 @@ export default function Calculator() {
           <div className="absolute inset-0 -z-10">
             <div
               className="skewed-linear w-full"
-              style={{ height: 'calc(var(--vh, 1vh) * 73)' }}
+              style={{ height: 'calc(var(--vh, 1vh) * 74)' }}
             />
           </div>
         )}

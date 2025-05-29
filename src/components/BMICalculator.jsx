@@ -95,7 +95,7 @@ export default function BMICalculator({ setHasResult }) {
       <Toaster position="top-center" />
       
       {!bmiResult && !isLoading && (
-        <div className="max-w-md w-full">
+        <div className="max-w-sm w-full">
           <form onSubmit={calculateBMI} className="space-y-6">
             {/* Gender */}
             <div className="grid grid-cols-2 gap-4">
