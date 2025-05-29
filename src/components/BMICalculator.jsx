@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient'; 
 import BMIResult from './BMIResult'; 
 import { FaMale, FaFemale } from 'react-icons/fa';
+import { toast, Toaster } from 'react-hot-toast';
 
-export default function BMICalculator() {
+export default function BMICalculator({ setHasResult }) {
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
@@ -12,21 +13,19 @@ export default function BMICalculator() {
   const [bmiResult, setBmiResult] = useState(null);
   const [category, setCategory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const calculateBMI = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setBmiResult(null);
-    setError('');
 
     if (!gender) {
-      setError('Silakan pilih jenis kelamin.');
+      toast.error('Silakan pilih jenis kelamin.');
       setIsLoading(false);
       return;
     }
     if (height <= 0 || weight <= 0 || age <= 0 || isNaN(parseFloat(height)) || isNaN(parseFloat(weight)) || isNaN(parseInt(age))) {
-      setError('Usia, tinggi badan, dan berat badan harus diisi dengan angka yang valid dan lebih dari 0.');
+      toast.error('Usia, tinggi badan, dan berat badan harus diisi dengan angka yang valid dan lebih dari 0.');
       setIsLoading(false);
       return;
     }
@@ -49,6 +48,7 @@ export default function BMICalculator() {
 
     setBmiResult(calculatedBmi);
     setCategory(bmiCategory);
+    if (setHasResult) setHasResult(true); // ← Notifikasi ke parent
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -57,26 +57,25 @@ export default function BMICalculator() {
     }
     
     if (user) {
-      const { error: dbError } = await supabase.from('bmi_records').insert([
-        {
-          user_id: user.id,
-          gender,
-          age: parseInt(age),
-          height: parseFloat(height),
-          weight: parseFloat(weight),
-          bmi: calculatedBmi,
-          category: bmiCategory,
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      const { error: dbError } = await supabase.from('bmi_records').insert([{
+        user_id: user.id,
+        gender,
+        age: parseInt(age),
+        height: parseFloat(height),
+        weight: parseFloat(weight),
+        bmi: calculatedBmi,
+        category: bmiCategory,
+        created_at: new Date().toISOString(),
+      }]);
 
       if (dbError) {
         console.error('Gagal menyimpan data BMI:', dbError.message);
-        setError('Hasil BMI berhasil dihitung, tetapi gagal menyimpan data ke riwayat. Silakan coba lagi nanti.');
+        toast.error('Hasil BMI berhasil dihitung, tetapi gagal menyimpan data ke riwayat.');
       }
     } else {
-        console.log('User tidak login, BMI tidak disimpan ke riwayat.');
+      console.log('User tidak login, BMI tidak disimpan ke riwayat.');
     }
+
     setIsLoading(false);
   };
 
@@ -88,33 +87,26 @@ export default function BMICalculator() {
     setBmiResult(null);
     setCategory('');
     setIsLoading(false);
-    setError('');
+    if (setHasResult) setHasResult(false); // ← Kembalikan skewed-linear
   };
-
-  const AlertMessage = ({ message }) => {
-    if (!message) return null;
-    return (
-      <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
-        <p className="font-bold">Peringatan</p>
-        <p>{message}</p>
-      </div>
-    );
-  };
-
+  
   return (
-    <div className="flex flex-col items-center">
+    <div className="w-full flex flex-col items-center">
+      <Toaster position="top-center" />
+      
       {!bmiResult && !isLoading && (
-        // Calculator card
-        <div className="max-w-lg w-full bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+        <div className="max-w-md w-full">
           <form onSubmit={calculateBMI} className="space-y-6">
-            {/* Gender Selection */}
+            {/* Gender */}
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
                 onClick={() => setGender('male')}
-                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg 
-                            transition-all duration-200 ease-in-out transform hover:scale-105
-                            ${gender === 'male' ? 'border-green-500 bg-green-50 shadow-lg scale-105 ring-2 ring-green-500 ring-offset-1' : 'border-gray-300 hover:border-gray-400'}`}
+                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                  gender === 'male'
+                    ? 'border-green-500 bg-green-50 shadow-lg scale-105 ring-2 ring-green-500 ring-offset-1'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
               >
                 <FaMale size={30} className={`mb-2 ${gender === 'male' ? 'text-green-600' : 'text-gray-400'}`} />
                 <span className={`font-semibold ${gender === 'male' ? 'text-green-700' : 'text-gray-600'}`}>Laki-laki</span>
@@ -122,27 +114,27 @@ export default function BMICalculator() {
               <button
                 type="button"
                 onClick={() => setGender('female')}
-                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg 
-                            transition-all duration-200 ease-in-out transform hover:scale-105
-                            ${gender === 'female' ? 'border-pink-500 bg-pink-50 shadow-lg scale-105 ring-2 ring-pink-500 ring-offset-1' : 'border-gray-300 hover:border-gray-400'}`}
+                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                  gender === 'female'
+                    ? 'border-pink-500 bg-pink-50 shadow-lg scale-105 ring-2 ring-pink-500 ring-offset-1'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
               >
                 <FaFemale size={30} className={`mb-2 ${gender === 'female' ? 'text-pink-600' : 'text-gray-400'}`} />
                 <span className={`font-semibold ${gender === 'female' ? 'text-pink-700' : 'text-gray-600'}`}>Perempuan</span>
               </button>
             </div>
-            
-            <AlertMessage message={error} />
 
-            {/* Age Input */}
+            {/* Age */}
             <div>
-              <label htmlFor="age" className="block mb-1.5 text-sm font-medium text-gray-700">Berapa Usia Anda</label>
-              <div className="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
+              <label htmlFor="age" className="block mb-1.5 text-sm font-medium text-gray-700 mt-12">Berapa Usia Anda</label>
+              <div className="flex items-center border border-gray-300 rounded-3xl shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
                 <input
                   id="age"
                   type="number"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none"
+                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none rounded-3xl"
                   min="1"
                   placeholder="Masukan Usia Anda"
                 />
@@ -150,16 +142,16 @@ export default function BMICalculator() {
               </div>
             </div>
 
-            {/* Height Input */}
+            {/* Height */}
             <div>
               <label htmlFor="height" className="block mb-1.5 text-sm font-medium text-gray-700">Berapa Tinggi Anda</label>
-              <div className="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
+              <div className="flex items-center border border-gray-300 rounded-3xl shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
                 <input
                   id="height"
                   type="number"
                   value={height}
                   onChange={(e) => setHeight(e.target.value)}
-                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none"
+                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none rounded-3xl"
                   min="1"
                   placeholder="Masukan Tinggi Anda"
                 />
@@ -167,16 +159,16 @@ export default function BMICalculator() {
               </div>
             </div>
 
-            {/* Weight Input */}
+            {/* Weight */}
             <div>
               <label htmlFor="weight" className="block mb-1.5 text-sm font-medium text-gray-700">Berapa Berat Badan Anda</label>
-              <div className="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
+              <div className="flex items-center border border-gray-300 rounded-3xl shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 transition bg-white">
                 <input
                   id="weight"
                   type="number"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
-                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none"
+                  className="w-full p-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 appearance-none rounded-3xl"
                   min="1"
                   placeholder="Masukan Berat Badan Anda"
                 />
@@ -186,7 +178,7 @@ export default function BMICalculator() {
 
             <button
               type="submit"
-              className="w-full bg-green-500 text-white py-3.5 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-150 font-semibold text-lg shadow-md hover:shadow-lg"
+              className="w-full bg-green-500 text-white py-3.5 rounded-full hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-150 font-semibold text-lg shadow-md hover:shadow-lg"
               disabled={isLoading}
             >
               {isLoading ? 'Menghitung...' : 'Hitung BMI'}

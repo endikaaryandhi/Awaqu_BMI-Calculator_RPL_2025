@@ -65,7 +65,6 @@ const EditBio = ({ userId, initialBio, onBioUpdateSuccess }) => {
   };
 
   const charsUsed = bio.length;
-  const remainingChars = MAX_BIO_LENGTH - charsUsed;
 
   return (
     <div className="flex items-start gap-4">
