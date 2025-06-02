@@ -13,6 +13,7 @@ export default function BMICalculator({ setHasResult }) {
   const [bmiResult, setBmiResult] = useState(null);
   const [category, setCategory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSkewed, setShowSkewed] = useState(true); // ← Tambahan
 
   const calculateBMI = async (e) => {
     e.preventDefault();
@@ -48,14 +49,15 @@ export default function BMICalculator({ setHasResult }) {
 
     setBmiResult(calculatedBmi);
     setCategory(bmiCategory);
-    if (setHasResult) setHasResult(true); // ← Notifikasi ke parent
+    setShowSkewed(false); // ← Tambahan
+    if (setHasResult) setHasResult(true);
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) {
       console.warn('Gagal mengambil data user:', userError.message);
     }
-    
+
     if (user) {
       const { error: dbError } = await supabase.from('bmi_records').insert([{
         user_id: user.id,
@@ -87,13 +89,17 @@ export default function BMICalculator({ setHasResult }) {
     setBmiResult(null);
     setCategory('');
     setIsLoading(false);
-    if (setHasResult) setHasResult(false); // ← Kembalikan skewed-linear
+    setShowSkewed(true); // ← Tambahan
+    if (setHasResult) setHasResult(false); 
   };
-  
+
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center relative">
       <Toaster position="top-center" />
       
+      {/* skewed-linear */}
+      {showSkewed && <div className="skewed-linear" />} {/* ← Tambahan */}
+
       {!bmiResult && !isLoading && (
         <div className="max-w-sm w-full">
           <form onSubmit={calculateBMI} className="space-y-6">
