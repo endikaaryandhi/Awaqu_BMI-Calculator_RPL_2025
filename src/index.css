@@ -9,7 +9,7 @@ body {
 
 .skewed-linear {
   position: absolute;
-  top: 37px;
+  top: 153px;
   left: 0;
   width: 100%;
   height: 500px;
@@ -19,20 +19,3 @@ body {
   pointer-events: none;
 }
 
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient {
-  background: linear-gradient(-45deg, #2dd4bf, #fde68a, #4ade80, #60a5fa);
-  background-size: 300% 300%;
-  animation: gradientMove 15s ease infinite;
-}

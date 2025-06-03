@@ -94,7 +94,7 @@ export default function BMICalculator({ setHasResult }) {
   };
 
   return (
-    <div className="w-full flex flex-col items-center relative">
+    <div className="w-full flex flex-col items-center">
       <Toaster position="top-center" />
       
       {/* skewed-linear */}

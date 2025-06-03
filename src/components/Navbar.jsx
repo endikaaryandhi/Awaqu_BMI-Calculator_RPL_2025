@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
+import { FaLeaf } from 'react-icons/fa';
 
 const Navbar = () => {
   const location = useLocation();
@@ -15,13 +16,16 @@ const Navbar = () => {
     <header className="bg-gradient-to-r from-[#16B3AC] to-[#D2DC02] px-6 py-4 shadow-md">
       <div className="flex justify-between items-center">
         {/* Logo */}
-            <Link to="/" className="text-3xl text-black hover:opacity-80 transition">
-            <span className="font-bold">A</span>
-            <span>w</span>
-            <span>a</span>
-            <span className="font-bold">Q</span>
-            <span>u</span>
-            </Link>
+        <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition">
+          <FaLeaf className="text-green-700 text-4xl drop-shadow-lg transition-transform duration-300 hover:rotate-12 hover:scale-110" />
+          <h1 className="text-2xl md:text-3xl tracking-wide flex space-x-0.5">
+            <span className="font-bold text-gradient bg-gradient-to-r from-green-700 to-lime-500 bg-clip-text text-transparent">A</span>
+            <span className="text-green-700">w</span>
+            <span className="text-green-700">a</span>
+            <span className="font-bold text-gradient bg-gradient-to-r from-lime-500 to-green-700 bg-clip-text text-transparent">Q</span>
+            <span className="text-green-700">u</span>
+          </h1>
+        </Link>
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-6 text-sm font-medium">
