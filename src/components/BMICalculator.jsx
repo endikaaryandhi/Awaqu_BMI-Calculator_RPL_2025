@@ -104,7 +104,7 @@ export default function BMICalculator({ setHasResult }) {
         <div className="max-w-sm w-full h-full max-h-screen overflow-y-auto flex items-center justify-center">
           <form onSubmit={calculateBMI} className="space-y-6 w-full px-4">
             {/* Gender */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 overflow-visible mt-1">
               <button
                 type="button"
                 onClick={() => setGender('male')}
