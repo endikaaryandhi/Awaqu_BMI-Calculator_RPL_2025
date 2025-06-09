@@ -94,15 +94,15 @@ export default function BMICalculator({ setHasResult }) {
   };
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="relative w-full h-full max-w-screen flex justify-center items-center">
       <Toaster position="top-center" />
       
       {/* skewed-linear */}
       {showSkewed && <div className="skewed-linear" />} {/* ← Tambahan */}
 
       {!bmiResult && !isLoading && (
-        <div className="max-w-sm w-full">
-          <form onSubmit={calculateBMI} className="space-y-6">
+        <div className="max-w-sm w-full h-full max-h-screen overflow-y-auto flex items-center justify-center">
+          <form onSubmit={calculateBMI} className="space-y-6 w-full px-4">
             {/* Gender */}
             <div className="grid grid-cols-2 gap-4">
               <button
